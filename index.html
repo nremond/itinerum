@@ -24,29 +24,21 @@
 		/**
 		 * Create the map
 		 */
-	/*	var map = new google.maps.Map($('#map_canvas')[0], {
-			center: new google.maps.LatLng(46.042795,6.418376),
-			zoom: 14,
-			mapTypeId: google.maps.MapTypeId.TERRAIN
-		});
-
-*/
-
-  var directionDisplay;
-  var directionsService = new google.maps.DirectionsService();
-  var map;
-
- // function initialize() {
-    directionsDisplay = new google.maps.DirectionsRenderer();
-    var chicago = new google.maps.LatLng(46.042795,6.418376);
-    var myOptions = {
-      zoom:14,
-      mapTypeId: google.maps.MapTypeId.TERRAIN,
-      center: chicago
-    }
-    map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-    directionsDisplay.setMap(map);
-//  }
+  
+		var rendererOptions = {
+			draggable: true
+		};
+		var directionsService = new google.maps.DirectionsService();
+		var directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
+		
+		var mapCenter = new google.maps.LatLng(46.042795,6.418376);
+		var mapOptions = {
+		  zoom:14,
+		  mapTypeId: google.maps.MapTypeId.TERRAIN,
+		  center: mapCenter
+		}
+		var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+    	directionsDisplay.setMap(map);
 
 
 
@@ -78,19 +70,25 @@
 		var end = new google.maps.LatLng(46.04285457684193, 6.417861015869107);
 		
 		function calcRoute() {
-		  var request = {
-			  origin: start,
-			  destination: end,
-			  // Note that Javascript allows us to access the constant
-			  // using square brackets and a string value as its
-			  // "property."
-			  travelMode: google.maps.TravelMode.WALKING
-		  };
-		  directionsService.route(request, function(response, status) {
-			if (status == google.maps.DirectionsStatus.OK) {
-			  directionsDisplay.setDirections(response);
-			}
-		  });
+			var request = {
+				origin: start,
+				destination: end,
+				waypoints: [
+				{
+					location:new google.maps.LatLng(46.039873085624265, 6.419105100524803),
+					stopover:false
+				}
+				],
+				// Note that Javascript allows us to access the constant
+				// using square brackets and a string value as its
+				// "property."
+				travelMode: google.maps.TravelMode['WALKING']
+			};
+			directionsService.route(request, function(response, status) {
+				if (status == google.maps.DirectionsStatus.OK) {
+					directionsDisplay.setDirections(response);
+				}
+			});
 		}
 		
 		
@@ -101,9 +99,10 @@
 
 
 
-	//http://code.google.com/apis/maps/documentation/javascript/overlays.html#MarkerAnimations
+		//http://code.google.com/apis/maps/documentation/javascript/overlays.html#MarkerAnimations
 
 		//from :46.03540697369472, 6.4238691640624666
+		//middle : 46.039873085624265, 6.419105100524803
 		//to : 46.04285457684193, 6.417861015869107
 
 	</script>
