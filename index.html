@@ -38,7 +38,7 @@
 		  center: mapCenter
 		}
 		var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-    	directionsDisplay.setMap(map);
+		directionsDisplay.setMap(map);
 
 
 
@@ -47,28 +47,68 @@
 		 */
 		var menu = new contextMenu({map:map});
 
-		// Add some items to the menu
-		menu.addItem('Zoom In', function(map, latLng){
-			map.setZoom( map.getZoom() + 1);
-			map.panTo( latLng );
+
+		
+		
+
+		var from, to, marker;
+		function calcRoute2() {
+			var request;
+			
+			if(!to) {
+				marker = new google.maps.Marker({
+					  position: from,
+					  map: map
+				  });
+				  console.log(marker);
+				  console.log(map);
+			} else {
+				request = {
+					origin: from,
+					destination: to,
+					travelMode: google.maps.TravelMode['WALKING']
+				};	
+				directionsService.route(request, function(response, status) {
+					if (status == google.maps.DirectionsStatus.OK) {
+						directionsDisplay.setDirections(response);
+					}
+				});
+				marker.setMap(null);
+			}
+			
+		}
+		
+		menu.addItem('Directions from here', function(map, latLng){
+			from = latLng;
+			menu.remove('from');
+			calcRoute2();
 		});
 
-		menu.addItem('Zoom Out', function(map, latLng){
-			map.setZoom( map.getZoom() - 1 );
-			map.panTo(latLng);
+		menu.addItem('Directions to here', function(map, latLng){
+			to = latLng;
+			calcRoute2();
 		});
+
+
+
+
+
+
+
+		//http://code.google.com/apis/maps/documentation/javascript/overlays.html#MarkerAnimations
+
+		//from :46.03540697369472, 6.4238691640624666
+		//middle : 46.039873085624265, 6.419105100524803
+		//to : 46.04285457684193, 6.417861015869107
 
 		menu.addSep();
-
-		menu.addItem('Center Here', function(map, latLng){
-			map.panTo(latLng);
+		menu.addItem('Show me the way', function(map, latLng){
+			console.log(latLng);
+			calcRoute();
 		});
-		
-		
-		
+
 		var start = new google.maps.LatLng(46.03540697369472, 6.4238691640624666);
 		var end = new google.maps.LatLng(46.04285457684193, 6.417861015869107);
-		
 		function calcRoute() {
 			var request = {
 				origin: start,
@@ -90,21 +130,36 @@
 				}
 			});
 		}
-		
-		
-		menu.addItem('Show me the way', function(map, latLng){
-			console.log(latLng);
-			calcRoute();
+
+
+
+
+
+
+
+
+
+
+		menu.addSep();
+
+		// Add some items to the menu
+		menu.addItem('Zoom In', function(map, latLng){
+			map.setZoom( map.getZoom() + 1);
+			map.panTo( latLng );
 		});
 
+		menu.addItem('Zoom Out', function(map, latLng){
+			map.setZoom( map.getZoom() - 1 );
+			map.panTo(latLng);
+		});
 
+		menu.addSep();
 
-		//http://code.google.com/apis/maps/documentation/javascript/overlays.html#MarkerAnimations
-
-		//from :46.03540697369472, 6.4238691640624666
-		//middle : 46.039873085624265, 6.419105100524803
-		//to : 46.04285457684193, 6.417861015869107
-
+		menu.addItem('Center Here', function(map, latLng){
+			map.panTo(latLng);
+		});
+		
+		
 	</script>
 
 </body>
