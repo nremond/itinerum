@@ -9,24 +9,28 @@ connection = pymongo.Connection("127.0.0.1:27017")
 db = connection.hickingpath
 
 
-paths = db.paths
+routes = db.routes
 
 #remove all
-paths.remove()
+routes.remove()
 
-#insert some paths
-paths.insert({
+#insert some routes
+routes.insert({
 	'title': "Pointe d'Andey",
 	'author' : 'nicolas',
+	'origin' : [46.03540697369472, 6.4238691640624666],
+	'destination' : [46.04285457684193, 6.417861015869107],
 	'insert_date' : datetime.datetime.utcnow() 
 	})
-paths.insert({
+routes.insert({
 	'title': "Lac d'Arvoin",
 	'author' : 'nicolas',
+	'origin' : [46.03540697369472, 6.4238691640624666],
+	'destination' : [46.04285457684193, 6.417861015869107],
 	'insert_date' : datetime.datetime.utcnow() 
 	})
 	
 	
-fetched_paths = paths.find()
-for p in fetched_paths:
+fetched_routes = routes.find()
+for p in fetched_routes:
 	print p

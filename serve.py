@@ -20,7 +20,7 @@ class Application(tornado.web.Application):
 			(r"/favicon.ico", tornado.web.StaticFileHandler, {"path": "static/favicon.ico"}),
 			#(r"/robots.txt", tornado.web.StaticFileHandler, {"path": "static/robots.txt"}),
 			(r"/", MainHandler),
-			(r"/path/(?P<path_id>[^\/]+)", PathHandler),
+			(r"/route/(?P<route_id>[^\/]+)", RouteHandler),
         ]
         settings = dict(
             cookie_secret=config.COOKIE_SECRET,
@@ -37,13 +37,19 @@ db = connection.hickingpath
  
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
-		paths = db.paths.find()
-		titles = [p['title'] for p in paths]
-		self.render("main.html", titles=titles) 
+		routes = db.routes.find()
+		routes = [{'title': r['title'], 'id' : r['_id']} for r in routes]
+		self.render("main.html", routes=routes) 
  
-class PathHandler(tornado.web.RequestHandler):
- 	def get(self, path_id):
-		self.render("path.html", title="Youhou=%s" % path_id) 
+class RouteHandler(tornado.web.RequestHandler):
+ 	def get(self, route_id):
+ 		from pymongo.objectid import ObjectId
+ 		route = db.routes.find_one(ObjectId(route_id))
+ 		print route
+		self.render("route.html", 
+				title=route['title'], 
+				origin=route['origin'],
+				destination=route['destination']) 
  
 def main():
     tornado.options.parse_command_line()

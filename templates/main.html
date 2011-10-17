@@ -7,10 +7,10 @@
 </head>
 <body>
 
-	<h1> Hicking paths </h1>
+	<h1> Routes </h1>
 	<ul>
-		{% for title in titles %}
-			<li><a href="path/123">{{ escape(title) }}</a></li>
+		{% for route in routes %}
+			<li><a href="route/{{ route['id'] }}">{{ escape(route['title']) }}</a></li>
 		{% end %}
 	</ul>
 
