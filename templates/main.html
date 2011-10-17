@@ -9,9 +9,9 @@
 
 	<h1> Hicking paths </h1>
 	<ul>
-
-	  <li>Pointe d'Andey</li>
-	  <li>Lac d'arvouin</li>
+		{% for title in titles %}
+			<li><a href="path/123">{{ escape(title) }}</a></li>
+		{% end %}
 	</ul>
 
 </body>

@@ -11,7 +11,8 @@ import config
 import pymongo
 
 define("port", default=8888, help="run on the given port", type=int)
-        
+define("mongodb", default="127.0.0.1:27017", help="MongoDB")
+		
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
@@ -19,6 +20,7 @@ class Application(tornado.web.Application):
 			(r"/favicon.ico", tornado.web.StaticFileHandler, {"path": "static/favicon.ico"}),
 			#(r"/robots.txt", tornado.web.StaticFileHandler, {"path": "static/robots.txt"}),
 			(r"/", MainHandler),
+			(r"/path/(?P<path_id>[^\/]+)", PathHandler),
         ]
         settings = dict(
             cookie_secret=config.COOKIE_SECRET,
@@ -30,13 +32,18 @@ class Application(tornado.web.Application):
         )
         tornado.web.Application.__init__(self, handlers, **settings)
  
- 
+connection = pymongo.Connection(options.mongodb)
+db = connection.hickingpath
  
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
-		self.render("main.html") 
+		paths = db.paths.find()
+		titles = [p['title'] for p in paths]
+		self.render("main.html", titles=titles) 
  
- 
+class PathHandler(tornado.web.RequestHandler):
+ 	def get(self, path_id):
+		self.render("path.html", title="Youhou=%s" % path_id) 
  
 def main():
     tornado.options.parse_command_line()
