@@ -45,11 +45,15 @@ class RouteHandler(tornado.web.RequestHandler):
  	def get(self, route_id):
  		from pymongo.objectid import ObjectId
  		route = db.routes.find_one(ObjectId(route_id))
- 		print route
+		path = route['path']
+		path.insert(0, route['origin'])
+		path.append(route['destination'])
+		
 		self.render("route.html", 
 				title=route['title'], 
 				origin=route['origin'],
-				destination=route['destination']) 
+				destination=route['destination'],
+				path=path) 
  
 def main():
     tornado.options.parse_command_line()

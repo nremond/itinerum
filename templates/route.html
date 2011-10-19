@@ -10,20 +10,57 @@
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 	
 	<script type="text/javascript">
-	  function initialize() {
-		var myLatlng = new google.maps.LatLng{{ tuple(origin) }} ;
-		var myOptions = {
-		  zoom: 14,
-		  center: myLatlng,
-		  mapTypeId: google.maps.MapTypeId.TERRAIN
+		function toLatLng(array) {
+			return new google.maps.LatLng(array[0],array[1]);
 		}
-		var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 		
-		var marker = new google.maps.Marker({
-			position: myLatlng, 
-			map: map,
-			title:"Hello World!"
-		});   
+		function initialize() {
+		
+		 	var origin = new google.maps.LatLng{{ tuple(origin) }};
+			var destination = new google.maps.LatLng{{ tuple(destination) }};
+			
+
+
+			
+			var myOptions = {
+				zoom: 14,
+			  	center: origin,
+			  	mapTypeId: google.maps.MapTypeId.TERRAIN
+			}
+			var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+			
+			
+			var marker_origin = new google.maps.Marker({
+				position: origin, 
+				map: map,
+				title:"Hello World!"
+			}); 
+			
+			var marker_destination = new google.maps.Marker({
+				position: destination, 
+				map: map,
+				title:"Hello World!"
+			});   
+			
+			
+			// Display a polyline of the elevation path.
+			var locations = {{ path }};		
+			var path = [ toLatLng(loc) for each (loc in locations) ];
+			var pathOptions = {
+				path: path,
+				strokeColor: '#0000CC',
+				opacity: 0.4,
+				map: map
+			}
+			var polyline = new google.maps.Polyline(pathOptions);
+
+		
+		
+		
+	
+		
+		
+
 	  }
 	</script>
 	

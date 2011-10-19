@@ -74,8 +74,6 @@
 					  position: from,
 					  map: map
 				  });
-				  console.log(marker);
-				  console.log(map);
 			} else {
 				request = {
 					origin: from,
@@ -115,7 +113,6 @@
 
 		menu.addSep();
 		menu.addItem('Show me the way', function(map, latLng){
-			console.log(latLng);
 			calcRoute();
 		});
 
@@ -182,6 +179,8 @@
 		        map: map
 		      }
 		      polyline = new google.maps.Polyline(pathOptions);
+
+			console.log("polyline=" + elevationPath)
 
 		      // Extract the data from which to populate the chart.
 		      // Because the samples are equidistant, the 'Sample'
