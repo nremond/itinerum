@@ -6,6 +6,7 @@
 	
 	<title>Hiking path</title>
 	
+
 	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 	
@@ -14,21 +15,37 @@
 			return new google.maps.LatLng(array[0],array[1]);
 		}
 		
+		var map = null;
+		var chart = null;
+		
+		var mousemarker = null;
+		
+		// stuff for the elevation 
+		var elevator = null;
+		var infowindow = null;
+		
+		
+		// Load the Visualization API and the piechart package.
+		google.load("visualization", "1", {packages: ["columnchart"]});
+		
+		// Set a callback to run when the Google Visualization API is loaded.
+		google.setOnLoadCallback(initialize);
+		
 		function initialize() {
 		
 		 	var origin = new google.maps.LatLng{{ tuple(origin) }};
 			var destination = new google.maps.LatLng{{ tuple(destination) }};
 			
-
-
-			
+			// initialize the map
 			var myOptions = {
 				zoom: 14,
 			  	center: origin,
 			  	mapTypeId: google.maps.MapTypeId.TERRAIN
 			}
-			var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+			map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 			
+			// Create a new chart in the elevation_chart DIV.
+			chart = new google.visualization.ColumnChart(document.getElementById('elevation_chart'));
 			
 			var marker_origin = new google.maps.Marker({
 				position: origin, 
@@ -54,14 +71,75 @@
 			}
 			var polyline = new google.maps.Polyline(pathOptions);
 
-		
-		
-		
+			
+			// Load the Visualization API and the columnchart package.
+			//google.load("visualization", "1", {packages: ["columnchart"]});
+			elevator = new google.maps.ElevationService();
+			infowindow = new google.maps.InfoWindow();
+
+
+			google.visualization.events.addListener(chart, 'onmouseover', function(e) {
+				if (mousemarker == null) {
+					mousemarker = new google.maps.Marker({
+						position: elevations[e.row].location,
+						map: map,
+						icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+					});
+				} else {
+					mousemarker.setPosition(elevations[e.row].location);
+				}
+			});
+
+
+			drawElevationPath(path);
+		}
 	
-		
+		function drawElevationPath(path) {
 		
 
-	  }
+			// Create a PathElevationRequest object using this array.
+			// Ask for 256 samples along that path.
+			var pathRequest = {
+				'path': path,
+				'samples': 256
+			}
+			
+			// Initiate the path request.
+			elevator.getElevationAlongPath(pathRequest, plotElevation);
+		}
+		
+		// Takes an array of ElevationResult objects, draws the path on the map
+		// and plots the elevation profile on a Visualization API ColumnChart.
+		function plotElevation(results, status) {
+			if (status == google.maps.ElevationStatus.OK) {
+				elevations = results;
+				
+				// Extract the elevation samples from the returned results
+				// and store them in an array of LatLngs.
+				//var elevationPath = [elevation.location for each(elevation in elevations)];
+				
+				// Extract the data from which to populate the chart.
+				// Because the samples are equidistant, the 'Sample'
+				// column here does double duty as distance along the
+				// X axis.
+				var data = new google.visualization.DataTable();
+				data.addColumn('string', 'Sample');
+				data.addColumn('number', 'Elevation');
+				for (var i = 0; i < results.length; i++) {
+					data.addRow(['', elevations[i].elevation]);
+				}
+				
+				// Draw the chart using the data within its DIV. 
+				document.getElementById('elevation_chart').style.display = 'block';
+				chart.draw(data, {
+					width: 640,
+					height: 200,
+					legend: 'none',
+					titleY: 'Elevation (m)',
+					focusBorderColor: '#00ff00'
+				});
+			}
+		}
 	</script>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
@@ -72,15 +150,13 @@
 	
 </head>
 
-<body onload="initialize()">
- 
-
+<body>
 	<h1> {{ escape(title) }} </h1>
 
 	<div> origin : {{ tuple(origin) }} </div>
 	<div> destination : {{ destination }} </div>
 	
 	<div id="map_canvas"></div>
-	
+	<div id="elevation_chart" style="width:640px; height:200px; "></div>
 </body>
 </html>
